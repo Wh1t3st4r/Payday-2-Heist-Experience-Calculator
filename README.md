@@ -1,4 +1,4 @@
-# Payday-2-Heist-Experience-Calculator
+# Ultimate Payday 2 Heist Experience Calculator
 # How to use it?
 To use the program, execute the .jar in the cmd/powershell or just enter in the project folder and use it in your IDE of choice, and you are good to go! It's as simple as following the instructions printed and writing the specified data.
 
