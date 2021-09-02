@@ -1,44 +1,59 @@
 package main;
 
+import java.math.BigDecimal;
+
 public class HeistEXPCalculator {
 	
-	public static double heistCompletion, extraHeistCompletion, lootExperience = 8000, lootCounter, riskBonus;
-	public static double playerInCustody, perkDeckBonus, infamyBonus, crewAliveBonus, gagePacks, stealthBonus, repetitiveCompletion;
+	public static int baseHeistCompletion, extraHeistCompletion, lootExperience = 8000, lootCounter;
+	public static BigDecimal baseCalculation, riskBonus = new BigDecimal(0), additiveBonuses = new BigDecimal(0), playerInCustody, perkDeckBonus = new BigDecimal(0), infamyBonus, crewAliveBonus, gagePacks, stealthBonus, repetitiveCompletion;
 
 	public static void eXPFormula() {
-		double baseCalculation; 
-		if(riskBonus == 0) {
-			baseCalculation = (heistCompletion + extraHeistCompletion + (lootExperience * lootCounter));
-		} else {
-			baseCalculation = (heistCompletion + extraHeistCompletion + (lootExperience * lootCounter)) * riskBonus;
+		baseCalculation = new BigDecimal(baseHeistCompletion + extraHeistCompletion + (lootExperience * lootCounter));
+		if(riskBonus.doubleValue() != 0.0) {
+			baseCalculation = baseCalculation.multiply(riskBonus);
+			if(Main.debug == true) System.out.println("BaseCalculation: " + baseCalculation );		
 		}
-		double firstPercentageCalculation = percentageCalculator(baseCalculation, playerInCustody, false);
-		double secondPercentageCalculation = percentageCalculator(firstPercentageCalculation, perkDeckBonus, true);
-		double thirdPercentageCalculation = percentageCalculator(secondPercentageCalculation, infamyBonus, true);
-		double fourthPercentageCalculation = percentageCalculator(thirdPercentageCalculation, crewAliveBonus, true);
-		double fifthPercentageCalculation = percentageCalculator(fourthPercentageCalculation, gagePacks, true);
-		double sixthPercentageCalculation = percentageCalculator(fifthPercentageCalculation, stealthBonus, true);
-		double seventhPercentageCalculation = percentageCalculator(sixthPercentageCalculation, repetitiveCompletion, false);
-		int finalResult = (int)seventhPercentageCalculation;
-		System.out.println("Final XP: " + finalResult + "\n---------");
-//		System.out.println(firstPercentageCalculation);
-//		System.out.println(secondPercentageCalculation);
-//		System.out.println(thirdPercentageCalculation);
-//		System.out.println(fourthPercentageCalculation);
-//		System.out.println(fifthPercentageCalculation);
-//		System.out.println(sixthPercentageCalculation);
-//		System.out.println(seventhPercentageCalculation);
+		int[] percentageCalculation = new int[5];
+		percentageCalculation[0] = percentageCalculator(baseCalculation, playerInCustody, false);
+		percentageCalculation[1] = percentageCalculator(baseCalculation, perkDeckBonus, true);
+		percentageCalculation[2] = percentageCalculator(baseCalculation, infamyBonus, true);
+		percentageCalculation[3] = percentageCalculator(baseCalculation, crewAliveBonus, true);
+		percentageCalculation[4] = percentageCalculator(baseCalculation, gagePacks, true);
+		for(int i = 0; i < percentageCalculation.length; i++) {
+			additiveBonuses = additiveBonuses.add(new BigDecimal(percentageCalculation[i]));
+			if(Main.debug == true) System.out.println("Additive Bonus " + i + " " + percentageCalculation[i] + ": " + additiveBonuses);
+		}
+		BigDecimal finalExp = baseCalculation.add(additiveBonuses);
+		if(stealthBonus.doubleValue() != 0.0)
+			finalExp = finalExp.add(new BigDecimal(percentageCalculator(finalExp, stealthBonus, true)));
+		if(repetitiveCompletion.doubleValue() != 0.0) {
+			if(Main.debug == true) System.out.println("Executed repetitiveCompletion math: " + finalExp);
+			finalExp = finalExp.add(new BigDecimal(percentageCalculator(finalExp, repetitiveCompletion, false)));
+//			bonus = false'' already triggers a subtract method, applying it here broke everything, apparently math signal game is
+//			applicable to methods of java.Math, probably with every other value manipulation with negative numbers
+			
+		} // Fix these code lines above, subtracting is adding millions to the end result
+		System.out.println("Final XP: "  + finalExp + "\n---------");
 	}
 	
-	private static double percentageCalculator(double totalEXP, double percent, boolean penalty) {
-		double percentageFinalForm = totalEXP * percent;
+	private static int percentageCalculator(BigDecimal totalEXP, BigDecimal percent, boolean bonus) {
+		BigDecimal percentageFinalForm = totalEXP.multiply(percent);
 		// If the bonus is 0, there will be no consequences, since the calculations are separate, making it a seemless, accurate calculation that does the job.
-		if(penalty) {
-		double percentageConversionResult = totalEXP + percentageFinalForm;
-		return percentageConversionResult;
+		if(bonus) {
+			if(percent.doubleValue() == 0.0) //Returning int will break all decimals, dumbass!
+				return 0;
+			else {
+				BigDecimal percentageConversionResult = percentageFinalForm.add(totalEXP);
+				percentageConversionResult.intValue();
+				return percentageConversionResult.intValue();
+			}
 		}else {
-		double percentageConversionResult = totalEXP - percentageFinalForm;
-		return percentageConversionResult;
+			if(percent.doubleValue() == 0.0)
+				return 0;
+			else {
+				BigDecimal percentageConversionResult = percentageFinalForm.subtract(totalEXP); // Returns negative outcome
+				return percentageConversionResult.intValue();
+			}
 		}
 	}
 }
