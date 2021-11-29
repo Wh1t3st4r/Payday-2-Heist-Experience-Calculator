@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class ExperienceCalculator {
 	
 	/*
-	 * This part of the program was originaly developed by Nikolas Beltran (aka. nikolasb), studied and interpreted by me.
+	 * This part of the program was originally developed by Nikolas Beltran (aka. nikolasb), studied and interpreted by me.
 	 * 
 	 */
 	

@@ -1,74 +1,68 @@
 package main;
 
 import java.math.BigDecimal;
-import java.util.Scanner;
 
-public class HeistExperienceBase extends HeistEXPCalculator{
-	
-	static Scanner scanner = new Scanner(System.in);
+import javax.swing.JOptionPane;
+
+public class HeistExperienceBase extends HeistEXPCalculator {
 	
 	public static void heistExperienceLoop() {
-		Boolean continueExecution;
-		do {
 		infoGatherPrompt();
 		eXPFormula();
-		System.out.println("Do you want to repeat the calculations back from the start again? Y/N");
-		String continuationPrompt = scanner.nextLine();
-		if(continuationPrompt.equalsIgnoreCase("y")) {
-			continueExecution = true;
-		}else {
-			continueExecution = false;
-			scanner.close();
-			System.out.println("Happy Heisting!");
+		while(JOptionPane.showConfirmDialog(null, "Do you wish to repeat the calculation?") == 0) {
+			infoGatherPrompt();
+			eXPFormula();
 		}
-		} while(continueExecution);
 	}
 	
-	private static void infoGatherPrompt() {
-		System.out.println("How many bags do you want to be calculated?");
-		lootCounter = Integer.parseInt(scanner.nextLine());
-		System.out.println("What difficulty do you want to be considered?\nN (0x), H (2x), VH (5x), O (10x), M (11.5x), DW (13x), DS (14x)");
-		String riskBonus = scanner.nextLine();
-		switch(riskBonus.toUpperCase()) {
-		case "N": 
+	private static void infoGatherPrompt(){
+		
+		String[] riskBonusInput = {"Normal (0x)", "Hard (2x)", "Very Hard (5x)", "Overkill (10x)", "Mayhem (11.5x)", "Death Wish (13x)", "Death Sentence (14x)"};
+		boolean playerInCustodyBool;
+		
+		System.out.println(lootCounter = Integer.parseInt(JOptionPane.showInputDialog("How many bags of Meth will be delivered?")));
+		
+		switch(JOptionPane.showInputDialog(null, "Choose the Difficulty of the Heist: ", "Risk Bonus Multiplication", JOptionPane.PLAIN_MESSAGE, null, riskBonusInput, null).toString()) {
+		case "Normal (0x)": 
 			Main.riskBonus = new BigDecimal(0);
 		break;
-		case "H":
+		case "Hard (2x)":
 			Main.riskBonus = new BigDecimal(2.0);
 		break;
-		case "VH":
+		case "Very Hard (5x)":
 			Main.riskBonus = new BigDecimal(5.0);
 		break;
-		case "O":
+		case "Overkill (10x)":
 			Main.riskBonus = new BigDecimal(10.0);
 		break;
-		case "M":
+		case "Mayhem (11.5x)":
 			Main.riskBonus = new BigDecimal(11.5);
 		break;
-		case "DW":
+		case "Death Wish (13x)":
 			Main.riskBonus = new BigDecimal(13.0);
 		break;
-		case "DS":
+		case "Death Sentence (14x)":
 			Main.riskBonus = new BigDecimal(14.0);
 		break;				
 		}
-		System.out.println("Will the heist have any players in custody? Y/N");
-		String playerInCustody = scanner.nextLine();
-		if(playerInCustody.equalsIgnoreCase("y")) {
+		
+		if(JOptionPane.showConfirmDialog(null, "Will the heist have any players in custody?", "Players in Custody at the end of the heist", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null) == 0) {
 			Main.playerInCustody = new BigDecimal(0.3);
+			playerInCustodyBool = true;
 		}else {
 			Main.playerInCustody = new BigDecimal(0);
+			playerInCustodyBool = false;
 		}
-		System.out.println("Do you have the \"Blending In\" perk bonus in your current Perk Deck? Y/N");
-		String perkDeckBonus = scanner.nextLine();
-		if(perkDeckBonus.equalsIgnoreCase("y")) {
-			Main.perkDeckBonus = new BigDecimal(0.45);
+		
+		if(JOptionPane.showConfirmDialog(null, "Do you have the \"Blending In\" perk bonus in your current Perk Deck?", "Perk Deck Upgrade Skill", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null) == 0) {
+			Main.perkDeckBonus = new BigDecimal(0.3);
 		}else {
 			Main.perkDeckBonus = new BigDecimal(0);
 		}
-		System.out.println("What is your Infamy level? If you do not have one, just type \"0\"");
-		String infamyBonus = scanner.nextLine();
-		switch(infamyBonus) {
+		
+		String[] infamyBonusInput = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25"};
+		
+		switch(JOptionPane.showInputDialog(null, "What is your Infamy level? Select \"0\" if you don't have any Infamy Level", "Infamy Level (0 - 25) Gives bonuses", JOptionPane.QUESTION_MESSAGE, null, infamyBonusInput, null).toString()) {
 		case "1":
 			Main.infamyBonus = new BigDecimal(0.05);
 		break;
@@ -148,32 +142,32 @@ public class HeistExperienceBase extends HeistEXPCalculator{
 			Main.infamyBonus = new BigDecimal(0);
 		break;
 		}
-		System.out.println("How many teammates would be in custody when you escape the heist? Type \"0\" if everyone would escape \nRemember that the number counts only for your teammates, the bonus isn't applied with you.");
-		String crewAliveBonus = scanner.nextLine();
-		switch(crewAliveBonus) {
-		case "1":
-			Main.crewAliveBonus = new BigDecimal(0.20);
-		break;
-		case "2":
-			Main.crewAliveBonus = new BigDecimal(0.10);
-		break;
-		case "3":
-			Main.crewAliveBonus = new BigDecimal(0);
-		break;
-		default:
+		
+		if(playerInCustodyBool) {
+			switch(JOptionPane.showInputDialog(null, "How many teammates would be in custody when you escape the heist?", "Custody Check", JOptionPane.QUESTION_MESSAGE)) {
+			case "1":
+				Main.crewAliveBonus = new BigDecimal(0.20);
+			break;
+			case "2":
+				Main.crewAliveBonus = new BigDecimal(0.10);
+			break;
+			case "3":
+				Main.crewAliveBonus = new BigDecimal(0);
+			break;
+			} 
+		} else {
 			Main.crewAliveBonus = new BigDecimal(0.30);
-		break;
 		}
-		System.out.println("Would you get all Gage Packages? Y/N");
-		String gagePacks = scanner.nextLine();
-		if(gagePacks.equalsIgnoreCase("y")) {
+		
+		if(JOptionPane.showConfirmDialog(null, "Would you get all Gage Packages?", "Gage", JOptionPane.YES_NO_OPTION) == 0) {
 			Main.gagePacks = new BigDecimal(0.05);
 		}else {
 			Main.gagePacks = new BigDecimal(0);
 		}
-		System.out.println("How much stealth bonus percentage would you have (Just the number)?"); 
-		String stealthBonus = scanner.nextLine();
-		switch(stealthBonus) {
+		
+		String[] stealthBonusInput = {"0", "3", "5", "8", "10", "15", "20", "25"};
+		
+		switch(JOptionPane.showInputDialog(null, "How much stealth bonus percentage would you have?", "Stealth Bonus", JOptionPane.INFORMATION_MESSAGE, null, stealthBonusInput, null).toString()) {
 		case "3":
 			Main.stealthBonus = new BigDecimal(0.03);
 		break;
@@ -199,9 +193,9 @@ public class HeistExperienceBase extends HeistEXPCalculator{
 			Main.stealthBonus = new BigDecimal(0);
 		break;
 		}
-		System.out.println("How much Repetitive Completion penalty would be calculated? \n Use \"0.xx\" Syntax to represent the percentages");
-		repetitiveCompletion = scanner.nextBigDecimal();
-		scanner.nextLine();
+		
+		repetitiveCompletion = new BigDecimal(Double.parseDouble(JOptionPane.showInputDialog(null, "How much Repetitive Completion penalty Percentage would be calculated?", "Repetitive Completion Percentage", JOptionPane.QUESTION_MESSAGE)) / 100);
+
 		if(Main.debug == true) {
 		System.out.println(Main.riskBonus);
 		System.out.println(riskBonus);
